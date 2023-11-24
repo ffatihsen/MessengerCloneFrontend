@@ -4,15 +4,17 @@ const Input = ({
     label = "",
     name = "",
     type = "text",
-    clasName = "",
+    className = "",
     isRequired = false,
-    placeHolder = ""
+    placeHolder = "",
+    value = "",
+    onChange = () => {}
 }) => {
   return (
     <div className='w-1/2'>
         <label for = {name}  className='block text-sm font-medium text-gray-800 ' > {label} </label>
-        <input className= {` bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${clasName}`} 
-        type={type} id= {name} placeholder={placeHolder} required={isRequired}
+        <input className= {` bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${className}`} 
+        type={type} id= {name} placeholder={placeHolder} required={isRequired} value={value} onChange={onChange}
        />
 
 
