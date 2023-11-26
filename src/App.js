@@ -1,13 +1,42 @@
 import './App.css';
 import Dashboard from './modules/Dashboard';
 import Form from './modules/Form';
-
+import {Routes, Route, Navigate} from "react-router-dom"
 function App() {
+
+  const ProtectedRoute = ({children}) => {
+    const isLoggedIn = localStorage.getItem('user:token') !== null || true
+    if(!isLoggedIn) {
+      return <Navigate to = {"/user/sign_in" } />
+    }
+    else if(isLoggedIn && ["/user/sign_in", "/user/sign_up"].includes(window.location.pathname)){
+      return <Navigate to ={"/"} />
+    }
+
+    return children
+
+  }
+
   return (
-    <div className='bg-[#e1edff] h-screen flex justify-center items-center ' >
-      {/* <Form />   */}
-      <Dashboard />
-    </div>
+
+    <Routes>
+      
+      <Route path='/' element={
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>} />
+      
+      <Route path='/user/sign_in' element={
+      <ProtectedRoute>
+        <Form isSignInPage={true} />
+        </ProtectedRoute>} />
+      
+      <Route path='/user/sign_up' element={
+      <ProtectedRoute>
+        <Form isSignInPage={false} />
+      </ProtectedRoute>} />
+    </Routes>
+
   );
 }
 
