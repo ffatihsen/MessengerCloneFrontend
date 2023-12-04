@@ -4,9 +4,9 @@ import Form from './modules/Form';
 import {Routes, Route, Navigate} from "react-router-dom"
 function App() {
 
-  const ProtectedRoute = ({children}) => {
-    const isLoggedIn = localStorage.getItem('user:token') !== null || true
-    if(!isLoggedIn) {
+  const ProtectedRoute = ({children, auth=false}) => {
+    const isLoggedIn = localStorage.getItem('user:token') !== null || false
+    if(!isLoggedIn && auth) {
       return <Navigate to = {"/user/sign_in" } />
     }
     else if(isLoggedIn && ["/user/sign_in", "/user/sign_up"].includes(window.location.pathname)){
@@ -22,7 +22,7 @@ function App() {
     <Routes>
       
       <Route path='/' element={
-      <ProtectedRoute>
+      <ProtectedRoute auth = {true }>
         <Dashboard />
       </ProtectedRoute>} />
       

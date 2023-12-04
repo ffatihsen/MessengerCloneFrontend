@@ -1,6 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Avatar from "../../assets/avatar.png"
+import AvatarMe from "../../assets/avatarMe.png"
+import Avatar2 from "../../assets/avatarY1.jpeg"
+import Avatar3 from "../../assets/avatarWoman.png"
+import Avatar4 from "../../assets/avatar4.png"
+import Avatar5 from "../../assets/avatar5.png"
+
 import Input from '../../components/Input'
 
 const Dashboard = () => {
@@ -9,12 +15,12 @@ const Dashboard = () => {
         {
             name:"John",
             status:"Available",
-            img:Avatar
+            img:Avatar2
         },
         {
             name:"Marry",
             status:"Available",
-            img:Avatar
+            img:Avatar3
         },
         {
             name:"Alexander",
@@ -24,23 +30,45 @@ const Dashboard = () => {
         {
             name:"Adam",
             status:"Available",
-            img:Avatar
+            img:Avatar4
         },
         {
             name:"Alex",
             status:"Available",
-            img:Avatar
+            img:Avatar5
         }
     ]
 
+    useEffect(()=>{
+        const loggedInUser = JSON.parse(localStorage.getItem("user:detail"));
+
+        const fetcConversations = async () => {
+            const res = await fetch(`http://localhost:8000/api/conversations/${loggedInUser?.id}`,{
+                method:"GET",
+                headers:{
+                    "Content-Type" : "application/json",
+                }
+            });
+            const resData = await res.json()
+            setConversations(resData);
+        };
+        fetcConversations();
+    },[])
+
+    const [user,setUser] = useState(JSON.parse(localStorage.getItem("user:detail")));
+    const [conversations,setConversations] = useState([]);
+
+
   return (
     <div className='w-screen flex'>
+
+        
         <div className='w-[25%] border  h-screen bg-secondary'>
             <div className='flex  items-center my-8 mx-14'>
-                <div className='border border-primary p-[2px] rounded-full ' >  <img src={Avatar} width={75} height={75} /> </div>
+                <div className='border border-primary p-[2px] rounded-full ' >  <img src={AvatarMe} width={75} height={75} /> </div>
                 
                 <div className='ml-8'>
-                    <h3 className='text-2xl'>Tutorials Dev</h3>
+                    <h3 className='text-2xl'>{user?.fullName}</h3>
                     <p className='text-lg font-light'>My Account</p>
                 </div>
             </div>
@@ -51,15 +79,15 @@ const Dashboard = () => {
                 Messages
                 <div className=' text-primary text-lg' >
                     {
-                        contacts.map(({name,img,status}) => {
+                        conversations.map(({conversationId, user}) => {
                             return (
                                 <div className='flex  items-center py-8 border-b border-b-gray-300'>
                                 <div className='cursor-pointer flex items-center'>
-                                    <div>  <img src={img} width={60} height={60} /> </div>
+                                    <div>  <img src={Avatar2} width={60} height={60} /> </div>
                                     
                                     <div className='ml-6'>
-                                        <h3 className='text-xl font-semibold'>{name} </h3>
-                                        <p className='text-sm font-light text-gray-600'>{status} </p>
+                                        <h3 className='text-xl font-semibold'>{user?.fullName} </h3>
+                                        <p className='text-sm font-light text-gray-600'>{user?.email} </p>
                                     </div>
                                 
                                 </div>
@@ -94,28 +122,28 @@ const Dashboard = () => {
         <div className='h-[75%]  w-full overflow-scroll border-b shadow-sm'>
                     <div className='p-14'>
                         <div className='max-w-[40%] bg-secondary rounded-b-xl rounded-tr-xl p-4 mb-6'>
-                            Lorem Ipsum
+                            Hello Fatih !
                         </div>
 
                         <div className='max-w-[40%] bg-primary rounded-b-xl rounded-tl-xl ml-auto p-4 text-white mb-6'>
-                            Lorem Ipsum
+                            Hi Alexander
                         </div>
 
                         <div className='max-w-[40%] bg-secondary rounded-b-xl rounded-tr-xl p-4 mb-6'>
-                            Lorem Ipsum
+                            How are you ?
                         </div>
 
                         <div className='max-w-[40%] bg-primary rounded-b-xl rounded-tl-xl ml-auto p-4 text-white mb-6'>
-                            Lorem Ipsum
+                            I'm good and you :) 
                         </div>
 
 
                         <div className='max-w-[40%] bg-secondary rounded-b-xl rounded-tr-xl p-4 mb-6'>
-                            Lorem Ipsum
+                            I'm bad :/
                         </div>
 
                         <div className='max-w-[40%] bg-primary rounded-b-xl rounded-tl-xl ml-auto p-4 text-white mb-6'>
-                            Lorem Ipsum
+                            Why ? What happend ? 
                         </div>
 
 
