@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import Avatar from "../../assets/avatar.png"
 import AvatarMe from "../../assets/avatarMe.png"
@@ -32,6 +32,7 @@ const Dashboard = () => {
     const [message,setMessage] = useState("");
     const [users, setUsers] = useState([]);
     const [socket, setSocket] = useState(null);
+    const messageRef = useRef(null);
 
     useEffect(()=>{
         setSocket(io("http://localhost:8080"));
@@ -48,12 +49,17 @@ const Dashboard = () => {
         socket?.on("getMessage", data => {
             setMessages(prev => ({
                 ...prev,
-                messages : [...prev.messages, {user: data.user , message: data.message }]
+                messages : [...prev?.messages, {user: data.user , message: data.message }]
 
             }))
 
         })
     },[socket])
+
+
+    useEffect(()=>{
+        messageRef?.current?.scrollIntoView({ behavior : "smooth"});
+    },[messages?.messages])
 
 
 
@@ -69,6 +75,7 @@ const Dashboard = () => {
     }
 
     const sendMessage = async () => {
+        setMessage("")
         socket?.emit("sendMessage",{
             conversationId :messages?.conservationId,
             senderId : user?.id ,
@@ -88,7 +95,7 @@ const Dashboard = () => {
                 reciverId :messages?.reciver?.reciverId 
             })
         });
-        setMessage("")
+        
 
 
     }
@@ -112,7 +119,7 @@ const Dashboard = () => {
     <div className='w-screen flex'>
 
         
-        <div className='w-[25%] border  h-screen bg-secondary'>
+        <div className='w-[25%] border  h-screen bg-secondary overflow-scroll '>
             <div className='flex  items-center my-8 mx-14'>
                 <div className='border border-primary p-[2px] rounded-full ' >  <img src={AvatarMe} width={75} height={75} /> </div>
                 
@@ -187,9 +194,14 @@ const Dashboard = () => {
                         messages?.messages?.map(({message, user : {id} = {} }) => {
 
                             return(
-                                <div className={`max-w-[40%] bg-primary rounded-b-xl p-4 mb-6 ${id=== user?.id ? 'bg-rimary text-white rounded-tl-xl ml-auto' : 'bg-secondary rounded-tr-xl'}`}>
-                                   {message}
-                                </div>
+                                <>
+                                    <div className={`max-w-[40%] bg-primary rounded-b-xl p-4 mb-6 ${id=== user?.id ? 'bg-rimary text-white rounded-tl-xl ml-auto' : 'bg-secondary rounded-tr-xl'}`}>
+                                    {message}
+                                    </div>
+
+                                    <div ref={messageRef} > </div>
+
+                                </>
                             )
                             
                         }) :
@@ -221,7 +233,7 @@ const Dashboard = () => {
 
 
 
-        <div className='w-[25%] border  h-screen bg-light'>
+        <div className='w-[25%] border  h-screen bg-light px-8 py-16 overflow-scroll '>
 
                 <div  className='flex items-center py-8 border-b border-b-gray-300'  > People</div>
 
