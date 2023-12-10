@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Avatar from "../../assets/avatar.png"
 import AvatarMe from "../../assets/avatarMe.png"
 import Avatar2 from "../../assets/avatarY1.jpeg"
-import Avatar3 from "../../assets/avatarWoman.png"
-import Avatar4 from "../../assets/avatar4.png"
-import Avatar5 from "../../assets/avatar5.png"
+import {io} from "socket.io-client"
 
 import Input from '../../components/Input'
 
@@ -33,11 +31,33 @@ const Dashboard = () => {
     const [messages,setMessages] = useState({});
     const [message,setMessage] = useState("");
     const [users, setUsers] = useState([]);
+    const [socket, setSocket] = useState(null);
+
+    useEffect(()=>{
+        setSocket(io("http://localhost:8080"));
+    },[])
+
+
+    useEffect(()=>{
+
+        socket?.emit("addUser", user?.id);
+        socket?.on("getUsers", users =>{
+            console.log("44 de active users => ", users);
+        });
+
+        socket?.on("getMessage", data => {
+            setMessages(prev => ({
+                ...prev,
+                messages : [...prev.messages, {user: data.user , message: data.message }]
+
+            }))
+
+        })
+    },[socket])
 
 
 
     const fetchMessages =async (conservationId, reciver) => {
-        console.log("40 da user->",user);
         const res = await fetch(`http://localhost:8000/api/message/${conservationId}?senderId=${user?.id}&&reciverId=${reciver?.reciverId}`,{
             method:"GET",
             headers:{
@@ -45,11 +65,16 @@ const Dashboard = () => {
             }
         });
         const resData = await res.json();
-        console.log("resData->",resData);
         setMessages({messages : resData, reciver , conservationId })
     }
 
     const sendMessage = async () => {
+        socket?.emit("sendMessage",{
+            conversationId :messages?.conservationId,
+            senderId : user?.id ,
+            message,
+            reciverId :messages?.reciver?.reciverId 
+        });
 
         const res = await fetch(`http://localhost:8000/api/message`,{
             method:"POST",
@@ -63,7 +88,6 @@ const Dashboard = () => {
                 reciverId :messages?.reciver?.reciverId 
             })
         });
-        const resData = await res.json();
         setMessage("")
 
 
@@ -78,7 +102,6 @@ const Dashboard = () => {
                 }
             });
             const resData = await res.json()
-            console.log("resData->",resData);
             setUsers(resData);
         }
 
