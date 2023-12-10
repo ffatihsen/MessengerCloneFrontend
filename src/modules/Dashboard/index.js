@@ -32,11 +32,13 @@ const Dashboard = () => {
     const [conversations,setConversations] = useState([]);
     const [messages,setMessages] = useState({});
     const [message,setMessage] = useState("");
+    const [users, setUsers] = useState([]);
 
 
 
-    const fetchMessages =async (conservationId, user) => {
-        const res = await fetch(`http://localhost:8000/api/message/${conservationId}`,{
+    const fetchMessages =async (conservationId, reciver) => {
+        console.log("40 da user->",user);
+        const res = await fetch(`http://localhost:8000/api/message/${conservationId}?senderId=${user?.id}&&reciverId=${reciver?.reciverId}`,{
             method:"GET",
             headers:{
                 "Content-Type":"application/json",
@@ -44,7 +46,7 @@ const Dashboard = () => {
         });
         const resData = await res.json();
         console.log("resData->",resData);
-        setMessages({messages : resData, reciver :user, conservationId })
+        setMessages({messages : resData, reciver , conservationId })
     }
 
     const sendMessage = async () => {
@@ -66,6 +68,22 @@ const Dashboard = () => {
 
 
     }
+
+    useEffect(()=>{
+        const fetchUsers = async () => {
+            const res = await fetch(`http://localhost:8000/api/users/${user?.id}`,{
+                method: "GET",
+                headers:{
+                    "Content-Type": "application/json",
+                }
+            });
+            const resData = await res.json()
+            console.log("resData->",resData);
+            setUsers(resData);
+        }
+
+        fetchUsers()
+    },[])
 
   return (
     <div className='w-screen flex'>
@@ -181,6 +199,32 @@ const Dashboard = () => {
 
 
         <div className='w-[25%] border  h-screen bg-light'>
+
+                <div  className='flex items-center py-8 border-b border-b-gray-300'  > People</div>
+
+                <div className=' text-primary text-lg' >
+                    {
+                        users.length > 0 ? 
+                        users.map(({userId, user}) => {
+                            return (
+                                <div className='flex  items-center py-8 border-b border-b-gray-300'>
+                                <div className='cursor-pointer flex items-center' onClick={()=>{fetchMessages("new",user)}}>
+                                    <div>  <img src={Avatar2} width={60} height={60} /> </div>
+                                    
+                                    <div className='ml-6'>
+                                        <h3 className='text-xl font-semibold'>{user?.fullName} </h3>
+                                        <p className='text-sm font-light text-gray-600'>{user?.email} </p>
+                                    </div>
+                                
+                                </div>
+                            </div>
+                            )
+                        })
+                        :
+                        <div className='text-center text-lg font-semibold mt-24' > No Users </div>
+                    }
+                </div>
+
 
 
 
